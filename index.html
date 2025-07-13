@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador Pedagógico TeleEducación - TulaSalud</title>
+    <style>
+        /* --- Todos los estilos CSS van aquí, sin cambios --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        :root {
+            --bg-dark: #0f172a; --bg-light: #1e293b; --text-primary: #e2e8f0; --text-secondary: #94a3b8; --accent: #22d3ee; --accent-dark: #06b6d4; --border-color: #334155; --success: #22c55e; --warning: #facc15; --danger: #ef4444; --danger-dark: #dc2626;
+        }
+        body { font-family: 'Inter', sans-serif; line-height: 1.6; background-color: var(--bg-dark); color: var(--text-primary); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 2rem 1rem; }
+        .container { background-color: var(--bg-light); padding: 2.5rem 3rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); max-width: 700px; width: 100%; border: 1px solid var(--border-color); text-align: center; }
+        .logo-img { height: 80px; width: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; border: 3px solid var(--border-color); }
+        #upload-section, #analysis-section { text-align: center; }
+        #analysis-section { display: none; }
+        h1 { color: #ffffff; font-size: 1.75rem; margin-bottom: 0.5rem; }
+        h2 { color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; text-align: left; }
+        p.intro-text { color: var(--text-secondary); margin-bottom: 2.5rem; font-size: 1rem; }
+        .analysis-intro { color: var(--text-secondary); font-style: italic; border-left: 3px solid var(--accent); padding-left: 1.5rem; margin: 1.5rem 0; text-align: left;}
+        .upload-form { display: flex; flex-direction: column; gap: 1.5rem; }
+        .file-input-wrapper { border: 2px dashed var(--border-color); padding: 2.5rem 1.5rem; border-radius: 12px; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .file-input-wrapper:hover { background-color: rgba(34, 211, 238, 0.05); border-color: var(--accent); }
+        input[type="file"] { display: none; }
+        .file-label-icon { width: 48px; height: 48px; color: var(--accent); }
+        .file-label-text { font-weight: 500; }
+        .file-label-text span { color: var(--accent); font-weight: 700; }
+        #file-name { font-style: italic; color: var(--text-secondary); font-size: 0.875rem; min-height: 1.25rem; }
+        .btn { border: none; padding: 1rem; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; width: 100%; }
+        .btn-primary { background-color: var(--accent); color: var(--bg-dark); box-shadow: 0 4px 15px rgba(34, 211, 238, 0.1); }
+        .btn-primary:hover:not(:disabled) { background-color: var(--accent-dark); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(34, 211, 238, 0.2); }
+        .btn:disabled { background-color: var(--border-color); color: var(--text-secondary); cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-outline { background-color: transparent; color: var(--accent); border: 2px solid var(--border-color); }
+        .btn-outline:hover { border-color: var(--accent); }
+        .form-buttons { display: flex; gap: 1rem; }
+        .action-buttons { display: flex; gap: 1rem; margin-top: 2rem; }
+        .btn-secondary { background-color: transparent; color: var(--accent); border: 2px solid var(--accent); }
+        .btn-secondary:hover { background-color: var(--accent); color: var(--bg-dark); }
+        .btn-danger { background-color: var(--danger); color: var(--text-primary); }
+        .btn-danger:hover { background-color: var(--danger-dark); }
+        .results-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; text-align: left; }
+        .results-list li { background-color: var(--bg-dark); padding: 1.5rem; border-radius: 8px; border-left: 4px solid; }
+        .results-list h3 { margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.75rem; font-size: 1.1rem;}
+        .results-list p { margin: 0; color: var(--text-secondary); font-size: 0.95rem; }
+        .validation-item { border-color: var(--success); } .validation-item h3 { color: var(--success); }
+        .improvement-item { border-color: var(--warning); } .improvement-item h3 { color: var(--warning); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--bg-light); padding: 2.5rem; border-radius: 16px; max-width: 600px; width: 90%; position: relative; border: 1px solid var(--border-color); text-align: left; }
+        .modal-content h2 { margin-top: 0; color: var(--accent); text-align: center; }
+        .modal-content p { color: var(--text-secondary); line-height: 1.7; margin-bottom: 1rem; }
+        .modal-content strong { color: var(--text-primary); }
+        .modal-close { position: absolute; top: 1rem; right: 1.5rem; font-size: 2rem; color: var(--text-secondary); background: none; border: none; cursor: pointer; line-height: 1; }
+        .modal-close:hover { color: var(--text-primary); }
+        footer { margin-top: 2.5rem; text-align: center; color: var(--text-secondary); font-size: 0.875rem; }
+        /* Estilo para el contenedor de resultados REALES */
+        #real-analysis-content { white-space: pre-wrap; /* Respeta saltos de línea y espacios */ text-align: left; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="https://pbs.twimg.com/profile_images/535655953480175616/D5VRHaDd_400x400.jpeg" alt="Logo de TulaSalud" class="logo-img">
+        <h1>Analizador Pedagógico TeleEducación</h1>
+        <div id="upload-section">
+            <p class="intro-text">Sube un documento de Word (.doc, .docx) para un análisis pedagógico impulsado por IA.</p>
+            <form id="uploadForm" class="upload-form">
+                <label for="archivoWord" class="file-input-wrapper">
+                    <svg class="file-label-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M3.75 18A5.25 5.25 0 009 20.25h6A5.25 5.25 0 0020.25 15m-16.5 0A5.25 5.25 0 019 9.75h.386c1.38-2.363 3.94-4.114 6.914-4.114 3.978 0 7.25 3.272 7.25 7.25m-16.5 0h16.5" /></svg>
+                    <div class="file-label-text"><span>Haz clic aquí</span> o arrastra un archivo</div>
+                    <div id="file-name">Ningún archivo seleccionado</div>
+                </label>
+                <input type="file" id="archivoWord" name="documento_word" accept=".doc,.docx" required>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary" id="submitButton" disabled>Analizar Archivo</button>
+                    <button type="button" id="infoButton" class="btn btn-outline">Información</button>
+                </div>
+            </form>
+        </div>
+        <div id="analysis-section">
+            <!-- Este contenedor ahora estará vacío y se llenará con la respuesta de la IA -->
+            <div id="real-analysis-content"></div>
+            <div class="action-buttons">
+                <button id="resetButton" class="btn btn-secondary">Analizar otro documento</button>
+                <button id="closeButton" class="btn btn-danger">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="modalCloseButton" class="modal-close">×</button>
+            <h2>Información del Analizador Pedagógico</h2>
+            <p>Como parte fundamental de la formación en la Maestría para Personas Jóvenes y Adultas, de la Escuela de Posgrado de la Facultad de Humanidades de la Universidad de San Carlos de Guatemala, y como producto final del curso de Seminario II, se desarrolló esta herramienta con el objetivo claro de ayudar al departamento de Tele Educación de TulaSalud a evaluar la calidad del material didáctico.</p>
+            <p>La misma busca asegurar que dicho material no solo cumpla con los elementos propuestos por la política educativa para personas jóvenes y adultas, sino que también esté alineado con los objetivos y la visión de la institución.</p>
+            <p><strong>Autor:</strong> Lic. Luis Ygnacio Ponce Sierra</p>
+        </div>
+    </div>
+    <footer>
+        <p>© 2025 Lic. Luis Ygnacio Ponce Sierra | Todos los derechos reservados</p>
+    </footer>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('archivoWord');
+        const fileNameDisplay = document.getElementById('file-name');
+        const submitButton = document.getElementById('submitButton');
+        const uploadSection = document.getElementById('upload-section');
+        const analysisSection = document.getElementById('analysis-section');
+        const realAnalysisContent = document.getElementById('real-analysis-content');
+        const resetButton = document.getElementById('resetButton');
+        const closeButton = document.getElementById('closeButton');
+        const infoButton = document.getElementById('infoButton');
+        const infoModal = document.getElementById('infoModal');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) { fileNameDisplay.textContent = fileInput.files[0].name; submitButton.disabled = false; } else { fileNameDisplay.textContent = 'Ningún archivo seleccionado'; submitButton.disabled = true; }
+        });
+
+        uploadForm.addEventListener('submit', (event) => {
+            event.preventDefault(); 
+            submitButton.textContent = 'Analizando...'; 
+            submitButton.disabled = true;
+
+            // Prepara el archivo para enviarlo
+            const formData = new FormData();
+            formData.append('documento_word', fileInput.files[0]);
+
+            // Envía el archivo al backend (el "motor" de Python)
+            fetch('/api/analizar', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    realAnalysisContent.innerHTML = `<h2 style="color:var(--danger);">Error en el Análisis</h2><p>${data.error}</p>`;
+                } else {
+                    // Limpia el formato del texto de la IA y lo muestra
+                    realAnalysisContent.innerHTML = data.analisis.replace(/\*\*/g, '').replace(/\*/g, '<br><strong>*');
+                }
+                uploadSection.style.display = 'none';
+                analysisSection.style.display = 'block';
+            })
+            .catch(error => {
+                realAnalysisContent.innerHTML = `<h2 style="color:var(--danger);">Error de Conexión</h2><p>No se pudo conectar con el servidor de análisis. Por favor, inténtelo de nuevo más tarde. Detalles: ${error}</p>`;
+                uploadSection.style.display = 'none';
+                analysisSection.style.display = 'block';
+            });
+        });
+
+        resetButton.addEventListener('click', () => {
+            analysisSection.style.display = 'none'; uploadSection.style.display = 'block';
+            uploadForm.reset(); fileNameDisplay.textContent = 'Ningún archivo seleccionado';
+            submitButton.textContent = 'Analizar Archivo'; submitButton.disabled = true;
+        });
+
+        closeButton.addEventListener('click', () => { window.close(); });
+        infoButton.addEventListener('click', () => { infoModal.classList.add('active'); });
+        modalCloseButton.addEventListener('click', () => { infoModal.classList.remove('active'); });
+        infoModal.addEventListener('click', (event) => { if (event.target === infoModal) { infoModal.classList.remove('active'); } });
+    </script>
+</body>
+</html>
