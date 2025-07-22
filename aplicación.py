@@ -85,6 +85,7 @@ def analizar_documento():
         # Captura cualquier otro error durante el proceso
         return jsonify({"error": f"Ocurrió un error al procesar el archivo: {str(e)}"}), 500
 
+# Vercel redeploy trigger
 # Esta parte es necesaria para que algunos servicios de hosting encuentren la app
 if __name__ == '__main__':
     app.run()
